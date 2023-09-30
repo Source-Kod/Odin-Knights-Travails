@@ -1,20 +1,46 @@
 function createBoard() {
-  const board = [];
+  const board = {};
+
   for (let x = 0; x < 8; x++) {
     for (let y = 0; y < 8; y++) {
-      board.push(createNode([x, y], findPossibleMoves([x, y])));
+      const coord = [x, y];
+      board[coord] = createNode(coord, findPossibleMoves([x, y]));
     }
   }
+
   return board;
 }
 
-function knightMoves(start, end) {}
+function knightMoves(start, end) {
+  const board = createBoard();
+  const queue = [];
+
+  board[start.toString()].path = [];
+  queue.push(board[start.toString()]);
+
+  while (queue.length > 0) {
+    let currentNode = queue.shift();
+
+    if (currentNode.currentCoord.toString() === end.toString())
+      return currentNode.path;
+
+    for (const move of currentNode.possibleMoves) {
+      const moveKey = move.toString();
+      if (!board[moveKey].visited) {
+        queue.push(board[moveKey]);
+        board[moveKey].visited = true;
+        board[moveKey].path = [...currentNode.path, move];
+      }
+    }
+  }
+}
 
 function createNode(currentCoord = null, possibleMoves = null) {
   const node = {};
 
   node.currentCoord = currentCoord;
   node.possibleMoves = possibleMoves;
+  node.visited = false;
 
   return node;
 }
@@ -46,4 +72,4 @@ function checkIfMoveIsOnBoard(coord) {
   return true;
 }
 
-findPossibleMoves([0, 3]);
+console.log(knightMoves([7, 0], [2, 7]));
